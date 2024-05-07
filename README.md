@@ -1,5 +1,7 @@
 # Guide to use TWS 
 
+NOTE : Please Use Console for API status. URLs have not redirected after updating or creating a task.
+
 ## List of api end points
 
 1. tasks/ :
