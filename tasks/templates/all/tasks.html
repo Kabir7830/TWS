@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha512-DUC8yqWf7ez3JD1jszxCWSVB0DMP78eOyBpMa5aJki1bIRARykviOuImIczkxlj1KhVSyS16w2FSQetkD4UU2w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <style>
+        /* Apply styles to the table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd; /* Border around the table */
+}
+
+/* Apply styles to the table header cells (th) */
+thead th {
+  background-color: #f2f2f2; /* Light gray background */
+  color: #333; /* Dark text color */
+  border: 1px solid #ddd; /* Border around each cell */
+  padding: 8px; /* Padding inside each cell */
+  text-align: left; /* Align text to the left */
+}
+
+/* Apply styles to the table rows (tr) */
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Alternate row color */
+}
+
+/* Apply styles to the table data cells (td) */
+tbody td {
+  border: 1px solid #ddd; /* Border around each cell */
+  padding: 8px; /* Padding inside each cell */
+  text-align: left; /* Align text to the left */
+}
+
+    </style>
+    <table>
+        <thead>
+        <th>Task Title</th>
+        <th>Associated Users</th>
+        <th>Status</th>
+        <th>Edit</th>
+        <th>Read</th>
+        </thead>
+
+        <tbody id="id_tasks">
+
+        </tbody>
+
+    </table>
+
+    <script>
+    
+    let tasks = document.getElementById('id_tasks');
+    
+    $.ajax({
+        url:"{% url 'tasks' %}",
+        type:"GET",
+        contentType:"application/json",
+        success:function(data){
+            // console.log(data)
+            if (data['status']=='success'){
+                for (let task of data['tasks']){
+                    let tr = document.createElement("tr");
+                    // console.log(task)
+                    let td = document.createElement('td')
+                    td.innerHTML = task.title
+                    tr.appendChild(td);
+                    
+                     let td2 = document.createElement("td");
+                    let ul = document.createElement('ul');
+                    for(let user of data['users']){
+                        // console.log(user.id)
+                        for (let id of task.allowed_users){
+                            if (user.id == id){
+                                let li = document.createElement("li")
+                                li.innerHTML = user.username;
+                                ul.appendChild(li);
+                            }
+                            td2.appendChild(ul);
+                            tr.appendChild(td2);
+                        }
+                    } 
+
+                    let td3= document.createElement('td');
+                    td3.innerHTML = task.status;
+                    tr.appendChild(td3)
+
+                    let td4 = document.createElement('td');
+                    let edit_button = document.createElement('button')
+                    let anchor = document.createElement('a');
+                    anchor.innerHTML = task.title;
+                    anchor.href = `/task/${task.id}`;
+                    // console.log(anchor)
+                    edit_button.appendChild(anchor);
+                    td4.appendChild(edit_button);
+                    tr.appendChild(td4);
+
+                    let td5 = document.createElement('td');
+                    let read_a = document.createElement('a');
+                    read_a.innerHTML = "Read Task";
+                    read_a.href = `/read-task/${task.id}/`;
+                    td5.appendChild(read_a);
+                    tr.appendChild(td5);
+                    tasks.appendChild(tr);
+                }
+
+            }
+        }
+    })
+    </script>
+</body>
+</html>

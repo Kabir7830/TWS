@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+</head>
+<body>
+<style>
+    .container{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .first-step{
+        text-align: center;
+        padding: 10px;
+    }
+    button{
+        border:none;
+        border-radius: 10px;
+        background-color: rgb(131, 6, 6);
+        color: white;
+        padding: 10px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    button:hover{
+        background-color: rgb(152, 7, 7);
+
+    }
+    a{
+        background-color: whitesmoke;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 20px;
+        border:solid 1px rgb(227, 227, 227);
+        text-decoration: none;
+        color: black;
+        box-shadow: 0px 0px 6px rgba(0,0,0,0.3);
+        transition: 0.5s;
+        cursor: pointer;
+    }
+    a:hover{
+        transform: translateY(-10px);
+    }
+    .group{
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+<div class='container'>
+    
+    <p>
+    <form action="{% url 'logout' %}">
+    
+    <button type="submit">Logout</button>
+    </form>
+    </p>
+
+    <p class="group">
+    <a href="{% url 'create-task'%}">Create Task</a>
+    <a href="{% url 'all-tasks'%}">All Tasks</a>
+    </p>
+</div>
+</body>
+</html>

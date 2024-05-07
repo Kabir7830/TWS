@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha512-DUC8yqWf7ez3JD1jszxCWSVB0DMP78eOyBpMa5aJki1bIRARykviOuImIczkxlj1KhVSyS16w2FSQetkD4UU2w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Create Task</title>
+</head>
+<style>
+    .visually-hidden{
+        display: none !important;
+    }
+    .message.success{
+        color: green;
+    }
+    .message.error{
+        color: red;
+    }
+    input,textarea,select{
+        padding:10px;
+        background-color: whitesmoke;
+        border:solid 1px rgb(228, 228, 228);
+        width: 90%;
+    }
+    input[type=checkbox]{
+        width: 5%;
+
+    }
+    .group{
+        display: flex;
+        justify-content: center;
+        /* align-items: center; */
+        flex-direction: column;
+        gap: 10px;
+    }
+    label{
+        font-size: 20px;
+        font-weight: bold;
+    }
+    button{
+        background-color: rgb(54, 75, 230);
+        font-size: 20px;
+        border-radius: 10px;
+        border: none;
+        padding: 10px;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover{
+        background-color: rgb(42, 65, 237);
+
+    }
+</style>
+<body>
+    {% csrf_token %}
+    <div class="group">
+        <label for="">Title</label>
+        <input type="text" name="title" id="id_title">
+    </div>
+
+    <br>
+    <br>
+    <div class="group">
+        <label for="">Desctiption</label>
+        <textarea name="descripiton" id="id_description"></textarea>
+    </div>
+    <br>
+    <br>
+    <div class="group">
+        <label for="">Due Date</label>
+        <input type="datetime-local" name="due_date" id="id_due_date">
+    </div>
+
+    <br>
+    <br>
+
+    <label for="">Task Members</label>
+    <br>
+    {% for user in users %}
+    <input type="checkbox" data-target="task-members-list" value="{{user.id}}" onclick="set_task_members_input()">
+    <label for="">{{user.username}}</label>
+    <br>
+    {% endfor%}
+    <br>
+    <br>
+    <div class="group">
+        <label for="">Status</label>
+        <select name="status" id="id_status">
+            <option value="Todo" selected>Todo</option>
+            <option value="Inprogress">Inprogress</option>
+            <option value="Done">Done</option>
+        </select>
+    </div>
+    <br>
+    <br>
+    <br>
+    
+    <input type="hidden" name="users" id="id_users">
+
+    <button type="button" onclick="submit_form()">create</button>
+
+
+    <p class="message success visually-hidden" id="id_success_message"></p>
+    <p class="message success visually-hidden" id="id_error_message"></p>
+    <script>
+        let task_members = document.querySelectorAll('input[data-target="task-members-list"]');
+        let users = document.getElementById('id_users');
+        function set_task_members_input(){
+            a = new Array;
+            for (let task_member of task_members ){
+                if (task_member.checked){
+                    a.push(task_member.value)
+                }
+            }
+            users.value = `${a}`;
+            console.log(users.value)
+        }
+        function submit_form(){
+            let postData;
+            var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+            let success_message = document.getElementById('id_success_message');
+            let error_message = document.getElementById('id_error_message');
+            let title = document.getElementById('id_title');
+            let description = document.getElementById('id_description');
+            let due_date = document.getElementById('id_due_date');
+            let status = document.getElementById('id_status');
+            postData  ={
+                "title":title.value,
+                "description":description.value,
+                "due_date":due_date.value,
+                "allowed_users":users.value,
+                "status":status.value,
+            }
+
+        
+        $.ajax({
+            url:"{% url 'create-task' %}",
+            contentType:"application/json",
+            type:"POST",
+            data:JSON.stringify(postData),
+            beforeSend:function(xhr){
+                xhr.setRequestHeader("X-CSRFToken",csrftoken);
+            },
+            success:function(data){
+                console.log(data)
+                if (data['status'] == 'success'){
+                    success_message.innerHTML = data['message'];
+                }
+                else{
+                    error_message.innerHTML = data['message'];
+                }
+            },
+            error:function(xhr,textStatus,errorThrown){
+                console.log("AJAX ERROR - ",errorThrown);
+            }
+
+        })
+
+    }
+    </script>
+</body>
+</html>
